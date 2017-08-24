@@ -1,4 +1,4 @@
-echo "this shell script is going to setup a running ckan instance based on the CKAN 2.0 packages"
+echo "this shell script is going to setup a running ckan instance based on the CKAN 2.6 packages"
 
 echo "switching the OS language"
 locale-gen
@@ -9,21 +9,13 @@ echo "updating the package manager"
 sudo apt-get update
 
 echo "installing dependencies available via apt-get"
-sudo apt-get install -y nginx apache2 libapache2-mod-wsgi libpq5
+sudo apt-get install -y nginx apache2 libapache2-mod-wsgi libpq5 redis-server git-core
 
 echo "downloading the CKAN package"
-wget -q http://packaging.ckan.org/python-ckan_2.0_amd64.deb
+wget http://packaging.ckan.org/python-ckan_2.7-trusty_amd64.deb
 
 echo "installing the CKAN package"
-sudo dpkg -i python-ckan_2.0_amd64.deb
-
-echo "Preventing NGINX from being started on a reboot"
-sudo update-rc.d -f nginx disable
-
-echo "changing the apache configuration back to port 80"
-sudo cp /vagrant/vagrant/package_ports.conf /etc/apache2/ports.conf
-sudo cp /vagrant/vagrant/package_ckan_default.conf /etc/apache2/sites-available/ckan_default
-sudo service apache2 restart
+sudo dpkg -i python-ckan_2.7-trusty_amd64.deb
 
 echo "install postgresql and jetty"
 sudo apt-get install -y postgresql solr-jetty openjdk-6-jdk
@@ -31,6 +23,11 @@ sudo apt-get install -y postgresql solr-jetty openjdk-6-jdk
 echo "copying jetty configuration"
 cp /vagrant/vagrant/jetty /etc/default/jetty
 sudo service jetty start
+
+echo "resolving the bug \"HTTP 500: JSP support not configured.\" of jetty instalation"
+wget https://launchpad.net/~vshn/+archive/ubuntu/solr/+files/solr-jetty-jsp-fix_1.0.2_all.deb
+sudo dpkg -i solr-jetty-jsp-fix_1.0.2_all.deb
+sudo service jetty restart
 
 echo "linking the solr schema file"
 sudo mv /etc/solr/conf/schema.xml /etc/solr/conf/schema.xml.bak
@@ -46,13 +43,12 @@ sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/portuguese_s
 sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/romanian_stop.txt /etc/solr/conf/romanian_stop.txt
 sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/spanish_stop.txt /etc/solr/conf/spanish_stop.txt
 sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/schema.xml /etc/solr/conf/schema.xml
-# sudo ln -s /usr/lib/ckan/default/src/ckan/ckan/config/solr/schema-2.0.xml /etc/solr/conf/schema.xml
-
+sudo ln -s /usr/lib/ckan/default/src/ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
 sudo service jetty restart
 
 echo "create a CKAN database in postgresql"
 sudo -u postgres createuser -S -D -R ckan_default
-sudo -u postgres psql -c "ALTER USER ckan_default with password 'pass'"
+sudo -u postgres psql -c "ALTER USER ckan_default with password 'ckan_default'"
 sudo -u postgres createdb -O ckan_default ckan_default -E utf-8
 
 echo "initialize CKAN database"
@@ -64,6 +60,7 @@ sudo mkdir -p /var/lib/ckan/default
 sudo chown www-data /var/lib/ckan/default
 sudo chmod u+rwx /var/lib/ckan/default
 sudo service apache2 restart
+sudo service nginx restart
 
 echo "creating an admin user"
 source /usr/lib/ckan/default/bin/activate
