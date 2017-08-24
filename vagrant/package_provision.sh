@@ -1,4 +1,4 @@
-echo "this shell script is going to setup a running ckan instance based on the CKAN 2.6 packages"
+echo "this shell script is going to setup a running ckan instance based on the CKAN 2.7 packages"
 
 echo "switching the OS language"
 locale-gen
@@ -33,18 +33,6 @@ sudo service jetty restart
 
 echo "linking the solr schema file"
 sudo mv /etc/solr/conf/schema.xml /etc/solr/conf/schema.xml.bak
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/dutch_stop.txt /etc/solr/conf/dutch_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/english_stop.txt /etc/solr/conf/english_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/fr_elision.txt /etc/solr/conf/fr_elision.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/french_stop.txt /etc/solr/conf/french_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/german_stop.txt /etc/solr/conf/german_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/greek_stopwords.txt /etc/solr/conf/greek_stopwords.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/italian_stop.txt /etc/solr/conf/italian_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/polish_stop.txt /etc/solr/conf/polish_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/portuguese_stop.txt /etc/solr/conf/portuguese_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/romanian_stop.txt /etc/solr/conf/romanian_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/spanish_stop.txt /etc/solr/conf/spanish_stop.txt
-sudo ln -s /usr/lib/ckan/default/src/ckan/ckanext/multilingual/solr/schema.xml /etc/solr/conf/schema.xml
 sudo ln -s /usr/lib/ckan/default/src/ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
 sudo service jetty restart
 
@@ -67,10 +55,7 @@ sudo service nginx restart
 echo "creating an admin user"
 source /usr/lib/ckan/default/bin/activate
 cd /usr/lib/ckan/default/src/ckan
-paster --plugin=ckan user add admin email=admin@email.org password=pass -c /etc/ckan/default/production.ini
+paster --plugin=ckan user add admin email=admin@email.org password=admin -c /etc/ckan/default/production.ini
 paster --plugin=ckan sysadmin add admin -c /etc/ckan/default/production.ini
-
-echo "loading some multilingual test data"
-paster --plugin=ckan create-test-data translations -c /etc/ckan/default/production.ini
 
 echo "you should now have a running instance on http://ckan.lo"
