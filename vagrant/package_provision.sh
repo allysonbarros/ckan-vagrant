@@ -6,26 +6,28 @@ export LC_ALL="en_US.UTF-8"
 sudo locale-gen en_US.UTF-8
 
 echo "updating the package manager"
-sudo apt-get update
+sudo apt-get update -q
 
 echo "installing dependencies available via apt-get"
-sudo apt-get install -y nginx apache2 libapache2-mod-wsgi libpq5 redis-server git-core
+sudo apt-get install -y -q nginx apache2 libapache2-mod-wsgi libpq5 redis-server git-core
 
 echo "downloading the CKAN package"
-wget http://packaging.ckan.org/python-ckan_2.7-trusty_amd64.deb
+wget -q http://packaging.ckan.org/python-ckan_2.7-trusty_amd64.deb
 
 echo "installing the CKAN package"
 sudo dpkg -i python-ckan_2.7-trusty_amd64.deb
 
 echo "install postgresql and jetty"
-sudo apt-get install -y postgresql solr-jetty openjdk-6-jdk
+sudo apt-get install -y -q postgresql solr-jetty openjdk-6-jdk
 
 echo "copying jetty configuration"
 cp /vagrant/vagrant/jetty /etc/default/jetty
 sudo service jetty start
 
-echo "resolving the bug \"HTTP 500: JSP support not configured.\" of jetty instalation"
-wget https://launchpad.net/~vshn/+archive/ubuntu/solr/+files/solr-jetty-jsp-fix_1.0.2_all.deb
+# echo "resolving the bug \"HTTP 500: JSP support not configured.\" of jetty instalation"
+# http://docs.ckan.org/en/ckan-2.7.0/maintaining/installing/install-from-source.html#jsp-support-not-configured
+cd /tmp
+wget -q https://launchpad.net/~vshn/+archive/ubuntu/solr/+files/solr-jetty-jsp-fix_1.0.2_all.deb
 sudo dpkg -i solr-jetty-jsp-fix_1.0.2_all.deb
 sudo service jetty restart
 
