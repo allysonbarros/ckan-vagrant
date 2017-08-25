@@ -17,16 +17,15 @@ wget -q http://packaging.ckan.org/python-ckan_2.7-trusty_amd64.deb
 echo "installing the CKAN package"
 sudo dpkg -i python-ckan_2.7-trusty_amd64.deb
 
-echo "install postgresql and jetty"
+echo "installing postgresql and jetty"
 sudo apt-get install -y -q postgresql solr-jetty openjdk-6-jdk
 
 echo "copying jetty configuration"
 cp /vagrant/vagrant/jetty /etc/default/jetty
 sudo service jetty start
 
-# echo "resolving the bug \"HTTP 500: JSP support not configured.\" of jetty instalation"
-# http://docs.ckan.org/en/ckan-2.7.0/maintaining/installing/install-from-source.html#jsp-support-not-configured
-cd /tmp
+echo "resolving the bug \"HTTP 500: JSP support not configured.\" of jetty instalation"
+echo "# http://docs.ckan.org/en/ckan-2.7.0/maintaining/installing/install-from-source.html#jsp-support-not-configured"
 wget -q https://launchpad.net/~vshn/+archive/ubuntu/solr/+files/solr-jetty-jsp-fix_1.0.2_all.deb
 sudo dpkg -i solr-jetty-jsp-fix_1.0.2_all.deb
 sudo service jetty restart
@@ -57,5 +56,10 @@ source /usr/lib/ckan/default/bin/activate
 cd /usr/lib/ckan/default/src/ckan
 paster --plugin=ckan user add admin email=admin@email.org password=admin -c /etc/ckan/default/production.ini
 paster --plugin=ckan sysadmin add admin -c /etc/ckan/default/production.ini
+
+echo "installing \"ckanext-dcat\" extension"
+pip install -e git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext-dcat
+cd /usr/lib/ckan/default/src/
+pip install -r ckanext-dcat/requirements.txt
 
 echo "you should now have a running instance on http://ckan.lo"
