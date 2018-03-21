@@ -40,6 +40,9 @@ sudo -u postgres createuser -S -D -R ckan_default
 sudo -u postgres psql -c "ALTER USER ckan_default with password 'ckan_default'"
 sudo -u postgres createdb -O ckan_default ckan_default -E utf-8
 
+echo "installing \"ckanext-opendataprocessor_theme\" extension"
+pip install -e git+https://github.com/allysonbarros/ckanext-opendataprocessor_theme.git#egg=ckanext-opendataprocessor_theme
+
 echo "initialize CKAN database"
 cp /vagrant/vagrant/package_production.ini /etc/ckan/default/production.ini
 sudo ckan db init
@@ -56,10 +59,5 @@ source /usr/lib/ckan/default/bin/activate
 cd /usr/lib/ckan/default/src/ckan
 paster --plugin=ckan user add admin email=admin@email.org password=admin -c /etc/ckan/default/production.ini
 paster --plugin=ckan sysadmin add admin -c /etc/ckan/default/production.ini
-
-echo "installing \"ckanext-dcat\" extension"
-pip install -e git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext-dcat
-cd /usr/lib/ckan/default/src/
-pip install -r ckanext-dcat/requirements.txt
 
 echo "you should now have a running instance on http://ckan.lo"
