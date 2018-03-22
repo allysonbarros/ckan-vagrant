@@ -41,6 +41,7 @@ sudo -u postgres psql -c "ALTER USER ckan_default with password 'ckan_default'"
 sudo -u postgres createdb -O ckan_default ckan_default -E utf-8
 
 echo "installing \"ckanext-opendataprocessor_theme\" extension"
+source /usr/lib/ckan/default/bin/activate
 pip install -e git+https://github.com/allysonbarros/ckanext-opendataprocessor_theme.git#egg=ckanext-opendataprocessor_theme
 
 echo "initialize CKAN database"
